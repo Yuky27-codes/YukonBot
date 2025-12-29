@@ -2,20 +2,38 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs-extra');
 const path = require('path');
+const mongoose = require('mongoose'); // Banco de Dados
+const ffmpeg = require('fluent-ffmpeg'); // Para Figurinhas Animadas
 
-// --- CONFIGURAÇÃO DE BANCO DE DADOS ---
+// --- CONFIGURAÇÃO DO MONGODB ---
+// Substitua 'SEU_LINK_AQUI' pelo link do MongoDB Atlas que você copiou
+const mongoURI = 'mongodb+srv://admin:teteu2025@cluster0.4wymucf.mongodb.net/?appName=Cluster0'; 
+
+mongoose.connect(mongoURI)
+    .then(() => console.log('✅ Conectado ao MongoDB Atlas!'))
+    .catch((err) => console.error('❌ Erro no MongoDB:', err));
+
+// Esquema para RPG e Economia (Onde a "memória" do bot vai morar)
+const userSchema = new mongoose.Schema({
+    userId: { type: String, unique: true },
+    coins: { type: Number, default: 0 },
+    xp: { type: Number, default: 0 },
+    level: { type: Number, default: 1 },
+    warns: { type: Number, default: 0 }
+});
+const User = mongoose.model('User', userSchema);
+
+// --- CONFIGURAÇÃO DE ARQUIVOS LOCAIS ---
 const dbPath = path.join(__dirname, 'database', 'advs.json');
 const superUsersPath = path.join(__dirname, 'database', 'superusers.json');
 
 fs.ensureDirSync(path.join(__dirname, 'database'));
-
 if (!fs.existsSync(dbPath)) fs.writeJsonSync(dbPath, {});
 if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        // SEM a linha do executablePath
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -26,11 +44,10 @@ const client = new Client({
 
 let salaAtual = "Nenhuma sala definida";
 
-// --- FUNÇÃO PARA EJETAR COM IMAGEM ---
+// --- FUNÇÕES AUXILIARES ---
 async function ejetarComImagem(chat, target) {
     try {
         const caminhoImagem = path.join(__dirname, 'ejetado.jpg');
-        
         if (fs.existsSync(caminhoImagem)) {
             const media = MessageMedia.fromFilePath(caminhoImagem);
             await chat.sendMessage(media, { 
@@ -38,60 +55,57 @@ async function ejetarComImagem(chat, target) {
                 mentions: [target] 
             });
         } else {
-            await chat.sendMessage(`🚫 @${target.split('@')[0]} ejetado! (Imagem 'ejetado.jpg' não encontrada)`, { 
-                mentions: [target] 
-            });
+            await chat.sendMessage(`🚫 @${target.split('@')[0]} ejetado!`, { mentions: [target] });
         }
         await chat.removeParticipants([target]);
-    } catch (e) {
-        console.log("Erro ao ejetar:", e);
-    }
+    } catch (e) { console.log("Erro ao ejetar:", e); }
 }
 
+// --- EVENTOS DO CLIENTE ---
 client.on('qr', qr => {
     console.log('ESCANEIE O QR CODE ABAIXO:');
     qrcode.generate(qr, {small: true});
 });
 
 client.on('ready', () => {
-    console.log('✅ Bot Online! Teste os comandos agora.');
+    console.log('✅ YukonBot Online na Square Cloud!');
 });
 
 client.on('message_create', async msg => {
     const chat = await msg.getChat();
-    if (!chat.isGroup) return;
-
-    const body = msg.body;
+    const body = msg.body || '';
     const command = body.split(' ')[0].toLowerCase();
     const args = body.split(' ').slice(1);
     
-    // --- LÓGICA DE IDENTIFICAÇÃO ---
+    // Identificação do Usuário
     const senderRaw = msg.author || msg.from || "";
     const senderNumber = senderRaw.replace(/\D/g, ''); 
 
-    const groupAdmins = chat.participants
+    // Garantir que o usuário existe no Banco de Dados (RPG/Economia)
+    // Isso cria o perfil dele automaticamente ao mandar qualquer mensagem
+    if (chat.isGroup) {
+        try {
+            await User.findOneAndUpdate(
+                { userId: senderRaw },
+                { $setOnInsert: { userId: senderRaw } },
+                { upsert: true }
+            );
+        } catch (e) { console.log("Erro ao salvar user no banco"); }
+    }
+
+    // Lógica de Admins
+    const groupAdmins = chat.isGroup ? chat.participants
         .filter(p => p.isAdmin || p.isSuperAdmin)
-        .map(p => p.id.user.replace(/\D/g, ''));
+        .map(p => p.id.user.replace(/\D/g, '')) : [];
     
-    // Lista de Super Usuários Salva no JSON
     const savedSuperUsers = fs.readJsonSync(superUsersPath);
+    const fixedOwners = ['29790077755587', '5524988268426', '94386822062195', '12060503109759'];
 
-    // IDs de Donos (Fixos no código)
-    const fixedOwners = [
-        '29790077755587', 
-        '5524988268426',    
-        '94386822062195',
-        '12060503109759'
-    ];
-
-    // Verificação Final de Admin
     const isAdmin = groupAdmins.includes(senderNumber) || 
                     savedSuperUsers.includes(senderNumber) || 
                     fixedOwners.some(id => senderNumber.includes(id));
 
-    const iAmAdmin = groupAdmins.includes(client.info.wid.user.replace(/\D/g, ''));
-
-    console.log(`> Comando: ${command} | Enviado por: ${senderNumber} | É Admin: ${isAdmin}`);
+    const iAmAdmin = chat.isGroup ? groupAdmins.includes(client.info.wid.user.replace(/\D/g, '')) : false;
 
     switch(command) {
         case 'sala':
