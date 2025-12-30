@@ -328,6 +328,30 @@ Estou aqui para ajudar na organização e na experiência de Among Us.
 
 Use *(painel)* para ver as opções disponíveis ou *(help)* para obter ajuda.`);
             break;
+
+        case '!s':
+        case '!sticker':
+            // Verifica se é uma imagem ou vídeo (ou se está respondendo a uma mídia)
+            if (msg.hasMedia || (msg.hasQuotedMsg && (await msg.getQuotedMessage()).hasMedia)) {
+                try {
+                    const messageWithMedia = msg.hasMedia ? msg : await msg.getQuotedMessage();
+                    const media = await messageWithMedia.downloadMedia();
+
+                    if (media) {
+                        await chat.sendMessage(media, {
+                            sendMediaAsSticker: true,
+                            stickerName: "YukonBot ❄️", // Nome do pacote
+                            stickerAuthor: "yukyDev"     // Autor
+                        });
+                    }
+                } catch (e) {
+                    console.log("Erro ao fazer figurinha:", e);
+                    msg.reply("❌ Erro ao processar a figurinha. Tente novamente!");
+                }
+            } else {
+                msg.reply("❗ Envie ou responda uma imagem/vídeo com o comando *!s*");
+            }
+            break;
     }
 });
 
