@@ -9,8 +9,10 @@ const groq = new Groq({ apiKey: "gsk_pUnbWAjVfl6SIVB6c8uKWGdyb3FYOaNLhuM0oYLURGZ
 const mongoURI = 'mongodb+srv://admin:teteu2025@cluster0.4wymucf.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(mongoURI)
-    .then(() => console.log('✅ Conectado ao MongoDB Atlas!'))
-    .catch((err) => console.error('❌ Erro no MongoDB:', err));
+    .then(async () => {
+        console.log('✅ Conectado ao MongoDB!');
+        await User.deleteMany({}); console.log('⚠️ TODOS OS PERFIS FORAM RESETADOS!');
+    })
 
 const userSchema = new mongoose.Schema({
     userId: { type: String, unique: true },
@@ -137,11 +139,11 @@ if (msg.hasQuotedMsg) {
     }
 }
     switch(command) {
-        case '/sala':
+        case 'sala':
             msg.reply(`🚀 Código da Sala: *${salaAtual}*`);
             break;
 
-        case '/addsala':
+        case 'addsala':
             if (!isAdmin) return;
             if (args.length > 0) {
                 salaAtual = args.join(' ').toUpperCase();
@@ -151,7 +153,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/adv':
+        case 'adv':
             if (!isAdmin) return msg.reply('❌ Comando apenas para ADMs.');
             if (msg.hasQuotedMsg) {
                 const quoted = await msg.getQuotedMessage();
@@ -175,7 +177,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/listaadv':
+        case 'listaadv':
             let data = fs.readJsonSync(dbPath);
             let listaMsg = "📋 *Lista de ADVs:*\n\n";
             let targets = [];
@@ -190,7 +192,7 @@ if (msg.hasQuotedMsg) {
             chat.sendMessage(listaMsg, { mentions: targets });
             break;
 
-        case '/todos':
+        case 'todos':
             let mentais = [];
             let texto = "📢 *ATENÇÃO TRIPULAÇÃO:*\n\n";
             const participantes = chat.participants;
@@ -201,7 +203,7 @@ if (msg.hasQuotedMsg) {
             await chat.sendMessage(texto, { mentions: mentais });
             break;
             
-        case '/ban':
+        case 'ban':
             if (!isAdmin) return msg.reply('❌ Só admins podem usar isso.');
             if (!iAmAdmin) return msg.reply('❌ Preciso ser admin para banir.');
             if (msg.hasQuotedMsg) {
@@ -213,21 +215,21 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/mute':
+        case 'mute':
             if (!isAdmin) return;
             if (!iAmAdmin) return msg.reply('❌ Preciso ser admin.');
             await chat.setMessagesAdminsOnly(true);
             msg.reply('🔇 Grupo mutado.');
             break;
 
-        case '/desmute':
+        case 'desmute':
             if (!isAdmin) return;
             if (!iAmAdmin) return msg.reply('❌ Preciso ser admin.');
             await chat.setMessagesAdminsOnly(false);
             msg.reply('🔊 Grupo aberto.');
             break;
 
-        case '/rmvadv':
+        case 'rmvadv':
             if (!isAdmin) return;
             if (msg.hasQuotedMsg) {
                 const quoted = await msg.getQuotedMessage();
@@ -243,7 +245,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/promover':
+        case 'promover':
             if (!isAdmin) return msg.reply('❌ Só admins.');
             if (msg.hasQuotedMsg) {
                 const quoted = await msg.getQuotedMessage();
@@ -262,7 +264,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/rebaixar':
+        case 'rebaixar':
             if (!isAdmin) return msg.reply('❌ Só admins.');
             if (msg.hasQuotedMsg) {
                 const quoted = await msg.getQuotedMessage();
@@ -282,7 +284,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case '/painel':
+        case 'painel':
             try {
                 const caminhoMenu = path.join(__dirname, 'menu.jpg');
                 const menuTexto = `
@@ -364,7 +366,7 @@ if (msg.hasQuotedMsg) {
             } catch (e) { console.log("Erro ao enviar menu:", e); }
             break;
 
-        case '/help':
+        case 'help':
             msg.reply(`🛠️ *YUKON BOT — SUPORTE* ❄️
 Precisa de ajuda ou tem sugestões de novos comandos?
 
@@ -385,8 +387,8 @@ Estou aqui para ajudar na organização e na experiência de Among Us.
 Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.`);
             break;
 
-        case '/f':
-        case '/figu':
+        case 'f':
+        case 'figu':
             if (msg.hasMedia || (msg.hasQuotedMsg && (await msg.getQuotedMessage()).hasMedia)) {
                 try {
                     const messageWithMedia = msg.hasMedia ? msg : await msg.getQuotedMessage();
@@ -404,7 +406,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             }
             break;
 
-        case '/perfil':
+        case 'perfil':
             const userProfile = await User.findOne({ userId: senderRaw });
             const pushName = msg._data.notifyName || "Tripulante";
             
@@ -432,7 +434,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             await chat.sendMessage(perfilMsg, { mentions: mentaisPerfil });
             break;
 
-        case '/yukonshop':
+        case 'yukonshop':
             const shopMsg = `🛒 *YUKON SHOP* ❄️\n` +
                             `Compre cargos estéticos para seu perfil!\n\n` +
                             `1️⃣ *Impostor* - 💰 500\n` +
@@ -442,7 +444,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             msg.reply(shopMsg);
             break;
 
-            case '/comprar':
+            case 'comprar':
             const item = args[0];
             const user = await User.findOne({ userId: senderRaw });
             const produtos = {
@@ -468,7 +470,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             }
             break;
 
-        case '/rank':
+        case 'rank':
             try {
                 const topUsers = await User.find({ userId: { $nin: ignorados } }).sort({ coins: -1 }).limit(10);
                 if (topUsers.length === 0) return msg.reply("✅ Ninguém no rank ainda.");
@@ -488,7 +490,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             } catch (e) { msg.reply("❌ Erro ao carregar o rank."); }
             break;
 
-        case '/addpts':
+        case 'addpts':
             if (!isAdmin) return;
             if (msg.hasQuotedMsg && args[0]) {
                 const quoted = await msg.getQuotedMessage();
@@ -498,7 +500,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                 msg.reply(`✅ Adicionado ${pts} YukonCoins ao usuário!`);
             } break;
 
-        case '/rmvpts':
+        case 'rmvpts':
             if (!isAdmin) return;
             if (msg.hasQuotedMsg && args[0]) {
                 const quoted = await msg.getQuotedMessage();
@@ -508,8 +510,8 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                 msg.reply(`❌ Removido ${pts} YukonCoins do usuário!`);
             } break;
 
-        case '/ia':
-        case '/bot':
+        case 'ia':
+        case 'bot':
             if (args.length === 0) return msg.reply("🤖 Digite algo! Ex: */ia ou /bot quem é você?*");
             try {
                 await chat.sendStateTyping();
@@ -524,7 +526,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             } catch (e) { msg.reply("⚠️ Minha inteligência está em manutenção!"); }
             break;
 
-         case '/amizade':
+         case 'amizade':
             if (!msg.mentionedIds[0]) return msg.reply("❗ Marque alguém para ver a amizade!");
             const targetAmigo = msg.mentionedIds[0]._serialized || msg.mentionedIds[0];
             const dataUser = await User.findOne({ userId: senderRaw });
@@ -535,7 +537,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             });
             break;
 
-        case '/ship':
+        case 'ship':
             if (!msg.mentionedIds[0]) return msg.reply("❗ Marque alguém para shippar!");
             const loveTarget = msg.mentionedIds[0]._serialized || msg.mentionedIds[0];
             const loveChance = Math.floor(Math.random() * 101);
@@ -545,7 +547,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             });
             break;
 
-        case '/casar':
+        case 'casar':
             if (!msg.mentionedIds[0]) return msg.reply("❗ Marque quem você quer pedir em casamento!");
             const pretendente = msg.mentionedIds[0]._serialized || msg.mentionedIds[0];
             if (pretendente === senderRaw) return msg.reply("😂 Você não pode casar com você mesmo!");
@@ -558,7 +560,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             });
             break;
 
-        case '/aceitarpedido':
+        case 'aceitarpedido':
             if (!msg.hasQuotedMsg) return msg.reply("❗ Responda ao pedido de casamento!");
             const quotedMsg = await msg.getQuotedMessage();
             const quemPediu = (quotedMsg.author || quotedMsg.from).toString();
@@ -570,11 +572,11 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             });
             break;
 
-         case '/cassino':
+         case 'cassino':
             msg.reply(`🎰 *YUKON CASSINO* 🎰\n\nEscolha seu multiplicador e boa sorte!\n\n*Uso:* apostar [valor] [multiplicador]\n*Ex:* /apostar 100 2\n\n⚠️ Quanto maior o multiplicador (2x até 10x), menor a chance de ganhar!`);
             break;
 
-        case '/apostar':
+        case 'apostar':
             const valorAposta = parseInt(args[0]);
             const mult = parseInt(args[1]) || 2;
             const player = await User.findOne({ userId: senderRaw });
@@ -591,13 +593,13 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                 msg.reply(`💸 *PERDEU!* 💸\nSorteio: ${sorteio}%\nO multiplicador ${mult}x era difícil! Você perdeu ${valorAposta} moedas.`);
             } break;
 
-        case '/divorciar':
+        case 'divorciar':
             const userDivorcio = await User.findOne({ userId: senderRaw });
             if (!userDivorcio || !userDivorcio.marriedWith) return msg.reply("🤔 Você nem casado é!");
             await chat.sendMessage(`💔 @${senderRaw.split('@')[0]} pediu o divórcio de @${userDivorcio.marriedWith.split('@')[0]}!\n\nResponda com */aceitardivorcio*`, { mentions: [senderRaw, userDivorcio.marriedWith] });
             break;
 
-        case '/aceitardivorcio':
+        case 'aceitardivorcio':
             if (!msg.hasQuotedMsg) return msg.reply("❗ Responda ao pedido!");
             const quotedDiv = await msg.getQuotedMessage();
             const quemPediuDiv = (quotedDiv.author || quotedDiv.from).toString();
@@ -608,8 +610,8 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             await chat.sendMessage(`📜 *DIVÓRCIO CONCLUÍDO* 📜\n\n@${senderRaw.split('@')[0]} e @${quemPediuDiv.split('@')[0]} solteiros.`, { mentions: [senderRaw, quemPediuDiv] });
             break;
 
-        case '/casais':
-        case '/listacasal':
+        case 'casais':
+        case 'listacasal':
             try {
                 const casaisDb = await User.find({ marriedWith: { $ne: null }, userId: { $nin: ignorados } });
                 if (casaisDb.length === 0) return msg.reply("💔 Nenhum casal visível.");
@@ -626,8 +628,8 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             } catch (e) { msg.reply("❌ Erro ao buscar casais."); }
             break;
 
-        case '/solteiros':
-        case '/listasolteiros':
+        case 'solteiros':
+        case 'listasolteiros':
             try {
                 const solteirosDb = await User.find({ marriedWith: null, userId: { $nin: ignorados } });
                 if (solteirosDb.length === 0) return msg.reply("❄️ Nenhum solteiro visível.");
