@@ -175,7 +175,7 @@ if (msg.hasQuotedMsg) {
             }
             break;
 
-        case 'listaadv':
+        case '/listaadv':
             let data = fs.readJsonSync(dbPath);
             let listaMsg = "📋 *Lista de ADVs:*\n\n";
             let targets = [];
