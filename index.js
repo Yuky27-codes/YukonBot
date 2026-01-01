@@ -610,22 +610,43 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             break;
 
         case '/casais':
-        case '/listacasal':
-            try {
-                const casaisDb = await User.find({ marriedWith: { $ne: null }, userId: { $nin: ignorados } });
-                if (casaisDb.length === 0) return msg.reply("💔 Nenhum casal visível.");
-                let msgCasais = `💍 *ESTADO CIVIL DO GRUPO* 💍\n\n`;
-                let processados = new Set();
-                let mentaisCasais = [];
-                for (const user of casaisDb) {
-                    if (processados.has(user.userId) || ignorados.includes(user.marriedWith)) continue;
-                    processados.add(user.marriedWith);
-                    msgCasais += `👩‍❤️‍👨 @${user.userId.split('@')[0]} & @${user.marriedWith.split('@')[0]}\n`;
-                    mentaisCasais.push(user.userId, user.marriedWith);
-                }
-                await chat.sendMessage(msgCasais, { mentions: mentaisCasais });
-            } catch (e) { msg.reply("❌ Erro ao buscar casais."); }
-            break;
+        case '/listacasal':
+            try {
+                // Busca todos que têm um parceiro definido
+                const casaisDb = await User.find({ marriedWith: { $ne: null } });
+                
+                if (casaisDb.length === 0) return msg.reply("💔 Nenhum casal formado ainda.");
+
+                let msgCasais = `💍 *ESTADO CIVIL DO GRUPO* 💍\n\n`;
+                let processados = new Set();
+                let mentaisCasais = [];
+                let encontrouCasal = false;
+
+                for (const user of casaisDb) {
+                    // Evita repetir o casal (ex: se processou A & B, não processa B & A)
+                    // E pula se algum dos dois estiver na lista de ignorados
+                    if (processados.has(user.userId) || 
+                        ignorados.includes(user.userId) || 
+                        ignorados.includes(user.marriedWith)) {
+                        continue;
+                    }
+
+                    processados.add(user.marriedWith);
+                    processados.add(user.userId);
+                    
+                    msgCasais += `👩‍❤️‍👨 @${user.userId.split('@')[0]} & @${user.marriedWith.split('@')[0]}\n`;
+                    mentaisCasais.push(user.userId, user.marriedWith);
+                    encontrouCasal = true;
+                }
+
+                if (!encontrouCasal) return msg.reply("💔 Nenhum casal visível no momento.");
+
+                await chat.sendMessage(msgCasais, { mentions: mentaisCasais });
+            } catch (e) { 
+                console.error(e);
+                msg.reply("❌ Erro ao buscar a lista de casais."); 
+            }
+            break;
 
         case '/solteiros':
         case '/listasolteiros':
