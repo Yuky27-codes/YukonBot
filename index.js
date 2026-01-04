@@ -139,7 +139,7 @@ if (msg.hasQuotedMsg) {
 }
     switch(command) {
         case '/sala':
-            msg.reply(`🚀 Código da Sala: *${salaAtual}*`);
+            msg.reply(`*${salaAtual}*`);
             break;
 
         case '/addsala':
