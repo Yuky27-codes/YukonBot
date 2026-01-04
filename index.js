@@ -49,7 +49,7 @@ const client = new Client({
     }
 });
 
-let salaAtual = "Nenhuma sala definida";
+let codigoSalvo = "Nenhuma sala aberta no momento.";
 
 // --- FUNÇÕES AUXILIARES ---
 async function ejetarComImagem(chat, target) {
@@ -138,19 +138,33 @@ if (msg.hasQuotedMsg) {
     }
 }
     switch(command) {
-        case '/sala':
-            msg.reply(`*${salaAtual}*`);
-            break;
 
-        case '/addsala':
-            if (!isAdmin) return;
-            if (args.length > 0) {
-                salaAtual = args.join(' ').toUpperCase();
-                msg.reply(`📍 Sala definida: *${salaAtual}*`);
-            } else {
-                msg.reply("❗ Digite o código da sala. Ex: *addsala ABCDE*");
-            }
-            break;
+        case '/sala':
+    // 1. Envia o código que estava guardado na memória
+    await chat.sendMessage(`${codigoSalvo}`);
+
+    // 2. Prepara a marcação (Mudamos o nome para evitar o erro de 'já declarado')
+    const listaGeral = chat.participants;
+    let mencoesGeral = [];
+    let textoMencao = "📢 *CHAMANDO TODOS:* ";
+
+    for (let p of listaGeral) {
+        mencoesGeral.push(p.id._serialized);
+        textoMencao += `@${p.id.user} `;
+    }
+
+    // 3. Envia a mensagem de marcação
+    // Enviamos o texto com os @s para garantir que o celular de todos toque
+    await chat.sendMessage(textoMencao, { mentions: mencoesGeral });
+    break;
+
+       case '/addsala':
+    const novoCodigo = args[0];
+    if (!novoCodigo) return msg.reply("❌ Digite o código! Ex: /addsala ABCDEF");
+    
+    codigoSalvo = novoCodigo.toUpperCase();
+    msg.reply(`📍Sala *${codigoSalvo}* definida com sucesso!`);
+    break;
 
         case '/adv':
             if (!isAdmin) return msg.reply('❌ Comando apenas para ADMs.');
