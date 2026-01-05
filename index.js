@@ -352,8 +352,8 @@ if (msg.hasQuotedMsg) {
 ⛔ /ban (respondendo) — Banir jogador (com imagem)
 📋 /listaadv — Lista de jogadores advertidos
 📣 /todos — Marcar todos os tripulantes
-➕ /addpts (respondendo) — Adiciona pontos ao usuário
-➖ /rmvpts (respondendo) — Remove pontos do Usuário
+➕ /addpts (respondendo) — Adiciona pontos ao usuário (comando desativado)
+➖ /rmvpts (respondendo) — Remove pontos do Usuário (comando desativado)
 
 ━━━━━━━━━━━━━━━━━━━━━━
 
@@ -503,7 +503,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
             } catch (e) { msg.reply("❌ Erro ao carregar o rank."); }
             break;
 
-        case '/addpts':
+        //case '/addpts':
             if (!isAdmin) return;
             if (msg.hasQuotedMsg && args[0]) {
                 const quoted = await msg.getQuotedMessage();
@@ -513,7 +513,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                 msg.reply(`✅ Adicionado ${pts} YukonCoins ao usuário!`);
             } break;
 
-        case '/rmvpts':
+       // case '/rmvpts':
             if (!isAdmin) return;
             if (msg.hasQuotedMsg && args[0]) {
                 const quoted = await msg.getQuotedMessage();
