@@ -523,37 +523,28 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                 msg.reply(`❌ Removido ${pts} YukonCoins do usuário!`);
             } break;
 
-        case 'ia':
-        case 'bot':
+        case '/ia':
+        case '/bot':
             if (args.length === 0) return msg.reply("🤖 Digite algo!");
             try {
-                // 1. Força o estado de "digitando..."
                 await chat.sendStateTyping();
 
-                // 2. Chamada da IA com o modelo que não costuma dar erro
                 const completion = await groq.chat.completions.create({
                     messages: [
                         { role: "system", content: "Você é a YukonBot, assistente amigável." },
                         { role: "user", content: args.join(' ') }
                     ],
-                    model: "llama3-8b-8192", // Modelo padrão das contas gratuitas
+                    // MODELO ATUALIZADO ABAIXO:
+                    model: "llama-3.1-8b-instant", 
                 });
 
-                // 3. Verificação da resposta
                 const respostaIA = completion.choices[0]?.message?.content;
-
                 if (respostaIA) {
                     msg.reply(`🤖 *Yukon IA:* \n\n${respostaIA}`);
-                } else {
-                    msg.reply("⚠️ A IA respondeu, mas o conteúdo veio vazio.");
                 }
 
             } catch (e) { 
-                // ISSO AQUI VAI TE DIZER O ERRO REAL NO TERMINAL (CONSOLE)
-                console.log("--- ERRO NA IA ---");
-                console.error(e); 
-                console.log("------------------");
-                
+                console.log(">>>> ERRO REAL DA IA:", e.response?.data || e.message || e); 
                 msg.reply("⚠️ Minha inteligência ainda está em manutenção!"); 
             }
             break;
