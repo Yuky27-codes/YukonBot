@@ -531,7 +531,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
 
                 const completion = await groq.chat.completions.create({
                     messages: [
-                        { role: "system", content: "Você é a YukonBot, assistente amigável." },
+                        { role: "system", content: "Você é a YukonBot, assistente amigável que tem 1 ano de idade, seu desenvolvedor é o YukyDev e tudo que alguém perguntar a você, você vai responter de forma engraçada, mas com a informação correta." },
                         { role: "user", content: args.join(' ') }
                     ],
                     // MODELO ATUALIZADO ABAIXO:
