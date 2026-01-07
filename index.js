@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const mongoose = require('mongoose');
 const ffmpeg = require('fluent-ffmpeg');
-const Groq = require("groq-sdk");
-const groq = new Groq({apiKey: "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"});
+const { Groq } = require("groq-sdk");
+const groq = new Groq({ apiKey: "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" });
 const mongoURI = 'mongodb+srv://admin:teteu2025@cluster0.4wymucf.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(mongoURI)
