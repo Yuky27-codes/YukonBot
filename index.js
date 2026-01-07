@@ -533,7 +533,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                         { role: "system", content: "Você é a YukonBot, a assistente oficial do grupo de Among Us. Desenvolvida pelo seu Dev (YukyDev). Suas respostas devem ser curtas, claras, amigáveis e com um toque divertido." },
                         { role: "user", content: args.join(' ') }
                     ],
-                    model: "llama-3.3-70b-versatile",
+                    model: "llama3-8b-8192",
                 });
                 msg.reply(`🤖 *Yukon IA:* \n\n${completion.choices[0]?.message?.content}`);
             } catch (e) { msg.reply("⚠️ Minha inteligência está em manutenção!"); }
