@@ -525,7 +525,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
 
         case '/ia':
         case '/bot':
-            if (args.length === 0) return msg.reply("🤖 Digite algo!");
+            if (args.length === 0) return msg.reply("🤖 Digite algo! EX: /bot ou /ia quem é você?");
             try {
                 await chat.sendStateTyping();
 
