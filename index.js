@@ -535,7 +535,7 @@ Use *(/painel)* para ver as opções disponíveis ou *(/help)* para obter ajuda.
                         { role: "user", content: args.join(' ') }
                     ],
                     // MODELO ATUALIZADO ABAIXO:
-                    model: "llama-3.1-8b-instant", 
+                    model: "llama-3.3-70b-versatile", 
                 });
 
                 const respostaIA = completion.choices[0]?.message?.content;
