@@ -40,15 +40,15 @@ if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 
 const client = new Client({
     puppeteer: {
-        headless: true,
+        headless: true, // Ou tente 'new' se o erro persistir
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage', // OBRIGATÓRIO NA SQUARE
+            '--disable-dev-shm-usage',
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process', // MUITO IMPORTANTE: economiza RAM
+            '--single-process',
             '--disable-gpu'
         ],
     }
