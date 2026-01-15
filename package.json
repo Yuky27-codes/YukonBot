@@ -1,11 +1,10 @@
-  {
+{
   "name": "yukon-bot",
   "version": "1.0.0",
-  "engines": {
-    "node": "20.x"
-  },
+  "description": "Bot Yukon para WhatsApp",
+  "main": "index.js",
   "scripts": {
-    "start": "index.js",
+    "start": "node index.js",
     "postinstall": "npx puppeteer browsers install chrome"
   },
 
@@ -24,7 +23,6 @@
     "path": "^0.12.7",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.26.0",
-    "puppeteer": "^22.0.0",
-    "packages": ["google-chrome-stable"]
+    "puppeteer": "^22.15.0"
   }
 }
