@@ -41,12 +41,15 @@ if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 const client = new Client({
     puppeteer: {
         headless: true,
-        // REMOVA a linha do executablePath que estava aqui
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--no-zygote'
+            '--disable-dev-shm-usage', // OBRIGATÓRIO NA SQUARE
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process', // MUITO IMPORTANTE: economiza RAM
+            '--disable-gpu'
         ],
     }
 });
