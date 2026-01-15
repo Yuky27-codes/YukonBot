@@ -4,7 +4,7 @@
   "description": "Bot para Among Us",
   "main": "index.js",
  "scripts": {
-    "start": "node seu_arquivo_principal.js",
+    "start": "index.js",
     "postinstall": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
