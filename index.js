@@ -41,15 +41,13 @@ if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 const client = new Client({
     puppeteer: {
         headless: true,
+        // REMOVA a linha do executablePath que estava aqui
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-gpu',
             '--no-zygote'
         ],
-        // Na Square Cloud, o Chrome geralmente fica neste caminho:
-        executablePath: '/usr/bin/google-chrome-stable' 
     }
 });
 
