@@ -39,14 +39,17 @@ if (!fs.existsSync(dbPath)) fs.writeJsonSync(dbPath, {});
 if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 
 const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-        ],
-    }
+    puppeteer: {
+        headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-extensions',
+            '--no-zygote',
+            '--single-process'
+        ],
+    }
 });
 
 let codigoSalvo = "Nenhuma sala aberta no momento.";
