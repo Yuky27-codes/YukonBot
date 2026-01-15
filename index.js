@@ -45,10 +45,11 @@ const client = new Client({
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-extensions',
-            '--no-zygote',
-            '--single-process'
+            '--disable-gpu',
+            '--no-zygote'
         ],
+        // Na Square Cloud, o Chrome geralmente fica neste caminho:
+        executablePath: '/usr/bin/google-chrome-stable' 
     }
 });
 

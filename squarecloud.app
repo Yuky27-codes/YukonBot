@@ -1,4 +1,4 @@
 MAIN=index.js
 MEMORY=512
-VERSION=recommended
+VERSION=20
 DISPLAY_NAME=YukonBot
