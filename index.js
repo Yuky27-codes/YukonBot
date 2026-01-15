@@ -41,13 +41,12 @@ if (!fs.existsSync(superUsersPath)) fs.writeJsonSync(superUsersPath, []);
 const client = new Client({
     puppeteer: {
         headless: true,
-        executablePath: '/usr/bin/google-chrome', // Tente este caminho agora que você atualizou as dependências
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--single-process',
-            '--no-zygote'
+            '--no-zygote',
+            '--single-process'
         ],
     }
 });
